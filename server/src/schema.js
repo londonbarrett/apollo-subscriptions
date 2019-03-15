@@ -1,6 +1,6 @@
-import { gql } from 'apollo-server-express';
+const { gql } = require('apollo-server-express');
 
-export default gql`
+module.exports = gql`
   type Query {
     board(channel: String!): [Message!]!
   }
@@ -10,11 +10,19 @@ export default gql`
   }
 
   type Subscription {
-    stream(channel: String!): Message
+    stream(channel: String!): Message!
+  }
+
+  type Channel {
+    id: ID!
+    name: String!
+    messages: [Message!]!
   }
 
   type Message {
-    channel: String!
+    id: ID!
     text: String!
+    channel: Channel!
   }
+
 `;

@@ -1,0 +1,16 @@
+# Git
+.git
+.gitignore
+.dockerignore
+
+# Docker configuration
+Dockerfile
+docker-compose.yml
+
+# NPM dependencies
+node_modules
+
+# Other
+.editorconfig
+init.sql
+README.MD

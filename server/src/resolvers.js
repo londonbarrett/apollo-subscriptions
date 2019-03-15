@@ -1,33 +1,30 @@
-import { withFilter } from 'apollo-server-express';
+const { withFilter } = require('apollo-server-express');
+const { MESSAGE_ADDED } = require('./consts');
 
-const MESSAGE_ADDED = 'MESSAGE_ADDED';
-
-const messages = [];
-
-const getChannelMessages = channel => messages.filter(
-  message => message.channel === channel
-);
-
-export default {
+module.exports = {
   Query: {
-    board: (_, { channel }) => getChannelMessages(channel)
+    board: (_, { channel }, { dataSources: { streamAPI } }) =>
+      streamAPI.getChannelMessages(channel)
   },
   Mutation: {
-    post: (_, { channel, text }, { pubsub, dataSources: { streamAPI } }) => {
-      streamAPI.helloWorld();
-      const message = { channel, text };
-      messages.push(message);
-      pubsub.publish(MESSAGE_ADDED, { channel, text });
-      return message;
-    },
+    post: (_, { channel, text }, { pubsub, dataSources: { streamAPI } }) =>
+      streamAPI.post(channel, text),
   },
   Subscription: {
     stream: {
       subscribe: withFilter(
         (_, __, { pubsub }) => pubsub.asyncIterator([MESSAGE_ADDED]),
-        (payload, variables) =>  payload.channel === variables.channel,
+        (payload, variables) => payload.channel.name === variables.channel,
       ),
       resolve: payload => payload,
     }
-  }
+  },
+  Channel: {
+    messages: ({ name }, _, { dataSources: { streamAPI } }) =>
+      streamAPI.getChannelMessages(name),
+  },
+  Message: {
+    channel: ({ id }, _, { dataSources: { streamAPI } }) =>
+      streamAPI.getMessageChannel(id),
+  },
 };

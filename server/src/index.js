@@ -1,19 +1,16 @@
-import { ApolloServer, PubSub } from 'apollo-server-express';
-import { createServer } from 'http';
-import express from 'express';
-import StreamAPI from './datasources/stream';
-import typeDefs from './schema';
-import resolvers from './resolvers';
+const { ApolloServer, PubSub } = require('apollo-server-express');
+const { createServer } = require('http');
+const express = require('express');
+const StreamAPI = require('./datasources/stream');
+const typeDefs = require('./schema');
+const resolvers = require('./resolvers');
 
 const PORT = 4000;
-
 const app = express();
-
-const pubsub = new PubSub();
 
 const dataSources = () => ({
   streamAPI: new StreamAPI()
-});
+})
 
 const server = new ApolloServer({
   context: { pubsub: new PubSub() },
